@@ -1,0 +1,37 @@
+name: Testing
+on:
+  push:
+    branches: main
+  workflow_dispatch:
+jobs:
+  Job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+        with:
+          submodules: true
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: latest
+
+      - name: Installing Dependencies
+        run: |
+          sudo apt-get install libxinerama-dev
+          sudo apt-get install libasound2-dev
+          sudo apt-get install mesa-common-dev
+          sudo apt-get install libgl-dev
+          sudo apt-get install libxi-dev
+          sudo apt-get install zip
+          sudo apt-get install libxrandr-dev
+          sudo apt-get install libudev-dev
+          sudo apt-get install libx11-dev
+          sudo apt-get install libxcursor-dev
+          sudo apt-get install libvlc-dev libvlccore-dev
+
+      - name: Compiling 
+        run: |
+          haxelib git raylib-haxe https://github.com/haxeui/raylib-haxe.git --quiet
+          haxe build.hxml

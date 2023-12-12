@@ -1,0 +1,7 @@
+-cp source
+-D analyzer-optimize
+-lib raylib-haxe
+-main Main
+-cpp export
+-cmd cp resources/video.mp4 export/video.mp4
+-cmd export/Main
