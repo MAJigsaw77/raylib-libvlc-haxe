@@ -3,24 +3,19 @@ package libvlc;
 #if !cpp
 #error 'LibVLC supports only C++ target platforms.'
 #end
-
-@:buildXml('
-<target id="haxe">
-	<section if="linux">
-		<lib name="-lvlc" />
-		<lib name="-lvlccore" />
-	</section>
-</target>')
 class Types {}
 
+@:buildXml('<include name="../../../../source/libvlc/Build.xml" />')
 @:include('vlc/vlc.h')
 @:native('libvlc_instance_t')
 extern class LibVLC_Instance_T {}
 
+@:buildXml('<include name="../../../../source/libvlc/Build.xml" />')
 @:include('vlc/vlc.h')
 @:native('libvlc_media_t')
 extern class LibVLC_Media_T {}
 
+@:buildXml('<include name="../../../../source/libvlc/Build.xml" />')
 @:include('vlc/vlc.h')
 @:native('libvlc_media_player_t')
 extern class LibVLC_MediaPlayer_T {}
