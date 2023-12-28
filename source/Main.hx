@@ -1,8 +1,6 @@
 package;
 
 import RayLib.Colors.*;
-import RayLib.Image;
-import RayLib.TextureFilter;
 import RayLib.Texture2D;
 import RayLib.*;
 
