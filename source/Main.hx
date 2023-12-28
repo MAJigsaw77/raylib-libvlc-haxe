@@ -14,18 +14,13 @@ import sys.FileSystem;
 #end
 
 @:headerInclude('assert.h')
-@:headerInclude('stdint.h')
 @:headerInclude('stdio.h')
 @:cppNamespaceCode('
 static void *lock(void *data, void **p_pixels)
 {
-	Texture2D *texture = reinterpret_cast<Texture2D *>(data);
+	unsigned char *pixels = reinterpret_cast<unsigned char *>(data);
 
-	Image image = LoadImageFromTexture(*texture);
-
-        (*p_pixels) = image.data;
-
-	UnloadImage(image);
+        (*p_pixels) = pixels;
 
 	return NULL; /* picture identifier, not needed here */
 }
@@ -99,7 +94,9 @@ class Main
 
 		texture = LoadTextureFromImage(GenImageColor(1280, 720, BLACK));
 
-		LibVLC.video_set_callbacks(player, untyped __cpp__('lock'), untyped __cpp__('unlock'), untyped __cpp__('display'), untyped __cpp__('&texture'));
+		var pixels:cpp.UInt8 = untyped __cpp__('new unsigned char[{0} * {1} * 4]', texture.width, texture.height);
+
+		LibVLC.video_set_callbacks(player, untyped __cpp__('lock'), untyped __cpp__('unlock'), untyped __cpp__('display'), untyped __cpp__('&pixels'));
 
 		LibVLC.video_set_format(player, "RGBA", texture.width, texture.height, texture.width * 4);
 
@@ -107,6 +104,8 @@ class Main
 
 		while (!WindowShouldClose())
 		{
+			UpdateTexture(texture, cast cpp.RawConstPointer.addressOf(pixels));
+			
 			BeginDrawing();
 
 			ClearBackground(RAYWHITE);
