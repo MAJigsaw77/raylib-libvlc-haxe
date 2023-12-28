@@ -38,17 +38,9 @@ class Main
 {
 	public static function main():Void
 	{
-		var instance:cpp.RawPointer<LibVLC_Instance_T>;
-		var media:cpp.RawPointer<LibVLC_Media_T>;
-		var player:cpp.RawPointer<LibVLC_MediaPlayer_T>;
-
-		var texture:Texture2D;
-		
-		final location:String = Sys.getCwd() + 'video.mp4';
-		
 		InitWindow(1280, 720, "RAYLIB/LIBVLC HAXE!");
 
-		SetTargetFPS(60);
+		SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
 		#if (windows || macos)
 		Sys.putEnv('VLC_PLUGIN_PATH', Path.join([Path.directory(Sys.programPath()), 'plugins']));
@@ -83,16 +75,20 @@ class Main
 			"--text-renderer=dummy"
 		};');
 
-		instance = LibVLC.create(untyped __cpp__('sizeof(args) / sizeof(*args)'), untyped __cpp__('args'));
+		var instance:cpp.RawPointer<LibVLC_Instance_T> = LibVLC.create(untyped __cpp__('sizeof(args) / sizeof(*args)'), untyped __cpp__('args'));
 
 		if (instance == null)
+		{
 			Sys.println('Failed to initialize LibVLC');
 
-		media = LibVLC.media_new_location(instance, 'https://github.com/GithubSPerez/the-shaggy-mod/raw/main/assets/videos/zoinks.mp4');
-		
-		player = LibVLC.media_player_new_from_media(media);
+			Sys.exit(1);
+		}
 
-		texture = LoadTextureFromImage(GenImageColor(1280, 720, BLACK));
+		var media:cpp.RawPointer<LibVLC_Media_T> = LibVLC.media_new_location(instance, 'https://github.com/GithubSPerez/the-shaggy-mod/raw/main/assets/videos/zoinks.mp4');
+		
+		var player:cpp.RawPointer<LibVLC_MediaPlayer_T> = LibVLC.media_player_new_from_media(media);
+
+		var texture:Texture2D = LoadTextureFromImage(GenImageColor(1280, 720, WHITE));
 
 		var pixels:cpp.RawPointer<cpp.UInt8> = untyped __cpp__('new unsigned char[{0} * {1} * 4]', texture.width, texture.height);
 
