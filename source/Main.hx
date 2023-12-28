@@ -36,6 +36,10 @@ class Main
 {
 	public static function main():Void
 	{
+		var instance:cpp.RawPointer<LibVLC_Instance_T>;
+		var media:cpp.RawPointer<LibVLC_Media_T>;
+		var player:cpp.RawPointer<LibVLC_MediaPlayer_T>;
+		
 		InitWindow(1280, 720, "RAYLIB/LIBVLC HAXE!");
 
 		SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
@@ -73,7 +77,7 @@ class Main
 			"--text-renderer=dummy"
 		};');
 
-		var instance:cpp.RawPointer<LibVLC_Instance_T> = LibVLC.create(untyped __cpp__('sizeof(args) / sizeof(*args)'), untyped __cpp__('args'));
+		instance = LibVLC.create(untyped __cpp__('sizeof(args) / sizeof(*args)'), untyped __cpp__('args'));
 
 		if (instance == null)
 		{
@@ -82,9 +86,11 @@ class Main
 			Sys.exit(1);
 		}
 
-		var media:cpp.RawPointer<LibVLC_Media_T> = LibVLC.media_new_location(instance, 'https://github.com/GithubSPerez/the-shaggy-mod/raw/main/assets/videos/zoinks.mp4');
+		media = LibVLC.media_new_location(instance, 'https://github.com/GithubSPerez/the-shaggy-mod/raw/main/assets/videos/zoinks.mp4');
 		
-		var player:cpp.RawPointer<LibVLC_MediaPlayer_T> = LibVLC.media_player_new_from_media(media);
+		player = LibVLC.media_player_new_from_media(media);
+
+		LibVLC.media_release(media);
 
 		var texture:Texture2D = LoadTextureFromImage(GenImageColor(1280, 720, WHITE));
 
@@ -113,10 +119,14 @@ class Main
 
 		LibVLC.media_player_stop(player);
 		LibVLC.media_player_release(player);
-		LibVLC.media_release(media);
+
+		if (pixels != null)
+			untyped __cpp__('delete[] {0}', pixels);
+
 		LibVLC.release(instance);
 
 		UnloadTexture(texture);
+
 		CloseWindow();
 	}
 }
