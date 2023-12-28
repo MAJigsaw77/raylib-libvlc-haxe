@@ -17,7 +17,7 @@ A Haxe/[RayLib](https://github.com/raysan5/raylib) example to play videos using 
         haxelib git raylib-haxe https://github.com/haxeui/raylib-haxe.git
         ```
 
-3. Look into [here](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux#install-required-tools) to install raylib libs in order to compile it.
+3. Look [here](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux#install-required-tools) to install raylib dependencies in order for the compile to work.
 
 4. You need to install [`vlc`](https://www.videolan.org/vlc) from your distro's package manager.
 
