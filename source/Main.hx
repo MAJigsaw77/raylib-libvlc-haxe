@@ -94,9 +94,9 @@ class Main
 
 		texture = LoadTextureFromImage(GenImageColor(1280, 720, BLACK));
 
-		var pixels:cpp.UInt8 = untyped __cpp__('new unsigned char[{0} * {1} * 4]', texture.width, texture.height);
+		var pixels:cpp.RawPointer<cpp.UInt8> = untyped __cpp__('new unsigned char[{0} * {1} * 4]', texture.width, texture.height);
 
-		LibVLC.video_set_callbacks(player, untyped __cpp__('lock'), untyped __cpp__('unlock'), untyped __cpp__('display'), untyped __cpp__('&pixels'));
+		LibVLC.video_set_callbacks(player, untyped __cpp__('lock'), untyped __cpp__('unlock'), untyped __cpp__('display'), untyped __cpp__('pixels'));
 
 		LibVLC.video_set_format(player, "RGBA", texture.width, texture.height, texture.width * 4);
 
@@ -104,7 +104,7 @@ class Main
 
 		while (!WindowShouldClose())
 		{
-			UpdateTexture(texture, cast cpp.RawConstPointer.addressOf(pixels));
+			UpdateTexture(texture, cast pixels);
 			
 			BeginDrawing();
 
