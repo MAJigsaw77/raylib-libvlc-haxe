@@ -88,7 +88,7 @@ class Main
 		if (instance == null)
 			Sys.println('Failed to initialize LibVLC');
 
-		media = LibVLC.media_new_path(instance, #if windows Path.normalize(location).split('/').join('\\') #else Path.normalize(location) #end);
+		media = LibVLC.media_new_location(instance, 'https://github.com/GithubSPerez/the-shaggy-mod/raw/main/assets/videos/zoinks.mp4');
 		
 		player = LibVLC.media_player_new_from_media(media);
 
