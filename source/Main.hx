@@ -4,9 +4,9 @@ import RayLib.Colors.*;
 import RayLib.Texture2D;
 import RayLib.*;
 
-import haxe.io.Path;
 import libvlc.LibVLC;
 import libvlc.Types;
+
 #if linux
 import sys.FileSystem;
 #end
@@ -44,9 +44,7 @@ class Main
 
 		SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
-		#if (windows || macos)
-		Sys.putEnv('VLC_PLUGIN_PATH', Path.join([Path.directory(Sys.programPath()), 'plugins']));
-		#elseif linux
+		#if linux
 		var pluginsPath:String = '/usr/local/lib/vlc/plugins';
 			
 		if (FileSystem.exists(pluginsPath) && FileSystem.isDirectory(pluginsPath))
@@ -70,10 +68,6 @@ class Main
 			"--no-stats",
 			"--no-video-title-show",
 			"--no-xlib",
-			#if defined(HX_WINDOWS) || defined(HX_MACOS)
-			"--reset-config",
-			"--reset-plugins-cache",
-			#endif
 			"--text-renderer=dummy"
 		};');
 
