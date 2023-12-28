@@ -75,7 +75,7 @@ class Main
 			"--no-spu",
 			"--no-stats",
 			"--no-video-title-show",
-			"-–no-xlib",
+			"--no-xlib",
 			#if defined(HX_WINDOWS) || defined(HX_MACOS)
 			"--reset-config",
 			"--reset-plugins-cache",
