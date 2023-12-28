@@ -24,6 +24,9 @@ extern class LibVLC
 	@:native('libvlc_media_new_path')
 	static function media_new_path(p_instance:cpp.RawPointer<LibVLC_Instance_T>, path:cpp.ConstCharStar):cpp.RawPointer<LibVLC_Media_T>;
 
+	@:native('libvlc_media_new_location')
+	static function media_new_location(p_instance:cpp.RawPointer<LibVLC_Instance_T>, psz_mrl:cpp.ConstCharStar):cpp.RawPointer<LibVLC_Media_T>;
+
 	@:native('libvlc_media_release')
 	static function media_release(p_md:cpp.RawPointer<LibVLC_Media_T>):Void;
 
