@@ -21,7 +21,7 @@ static void *lock(void *data, void **p_pixels)
 {
 	Texture2D *texture = reinterpret_cast<Texture2D *>(data);
 
-	Image image = GetTextureData(*texture);
+	Image image = LoadImageFromTexture(*texture);
 
         (*p_pixels) = image.data;
 
