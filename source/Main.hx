@@ -6,10 +6,12 @@ import RayLib.TextureFilter;
 import RayLib.Texture2D;
 import RayLib.*;
 
+import haxe.io.Path;
 import libvlc.LibVLC;
 import libvlc.Types;
-
-using haxe.io.Path;
+#if linux
+import sys.FileSystem;
+#end
 
 @:headerInclude('assert.h')
 @:headerInclude('stdint.h')
@@ -35,7 +37,7 @@ class Main
 {
 	public static function main():Void
 	{
-		var vlc:cpp.RawPointer<LibVLC_Instance_T>;
+		var instance:cpp.RawPointer<LibVLC_Instance_T>;
 		var media:cpp.RawPointer<LibVLC_Media_T>;
 		var player:cpp.RawPointer<LibVLC_MediaPlayer_T>;
 
@@ -49,7 +51,19 @@ class Main
 		SetTargetFPS(60);
 
 		#if (windows || macos)
-		Sys.putEnv('VLC_PLUGIN_PATH', '${Sys.programPath().directory()}/plugins');
+		Sys.putEnv('VLC_PLUGIN_PATH', Path.join([Path.directory(Sys.programPath()), 'plugins']));
+		#elseif linux
+		var pluginsPath:String = '/usr/local/lib/vlc/plugins';
+			
+		if (FileSystem.exists(pluginsPath) && FileSystem.isDirectory(pluginsPath))
+			Sys.putEnv('VLC_PLUGIN_PATH', pluginsPath);
+		else
+		{
+			pluginsPath = '/usr/lib/vlc/plugins';
+
+			if (FileSystem.exists(pluginsPath) && FileSystem.isDirectory(pluginsPath))
+				Sys.putEnv('VLC_PLUGIN_PATH', pluginsPath);
+		}
 		#end
 
 		untyped __cpp__('const char *args[] = {
@@ -57,14 +71,11 @@ class Main
 			"--intf=dummy",
 			"--no-interact",
 			"--no-lua",
-			"--no-osd",
 			"--no-snapshot-preview",
 			"--no-spu",
 			"--no-stats",
 			"--no-video-title-show",
-			#if defined(HX_LINUX)
 			"-–no-xlib",
-			#endif
 			#if defined(HX_WINDOWS) || defined(HX_MACOS)
 			"--reset-config",
 			"--reset-plugins-cache",
@@ -72,12 +83,12 @@ class Main
 			"--text-renderer=dummy"
 		};');
 
-		vlc = LibVLC.create(untyped __cpp__('sizeof(args) / sizeof(*args)'), untyped __cpp__('args'));
+		instance = LibVLC.create(untyped __cpp__('sizeof(args) / sizeof(*args)'), untyped __cpp__('args'));
 
-		if (vlc == null)
+		if (instance == null)
 			Sys.println('Failed to initialize LibVLC, Error: ${cast(LibVLC.errmsg(), String)}');
 
-		media = LibVLC.media_new_path(vlc, #if windows location.normalize().split('/').join('\\') #else location.normalize() #end);
+		media = LibVLC.media_new_path(instance, #if windows Path.normalize(location).split('/').join('\\') #else Path.normalize(location) #end);
 		
 		player = LibVLC.media_player_new_from_media(media);
 
@@ -89,7 +100,7 @@ class Main
 
 		LibVLC.video_set_callbacks(player, untyped __cpp__('lock'), untyped __cpp__('unlock'), untyped __cpp__('display'), untyped __cpp__('&image'));
 
-		LibVLC.video_set_format(player, "RGBA", 1280, 720, 5120);
+		LibVLC.video_set_format(player, "RGBA", 1280, 720, 1280 * 4);
 
 		LibVLC.media_player_play(player);
 
@@ -111,7 +122,7 @@ class Main
 		LibVLC.media_player_stop(player);
 		LibVLC.media_player_release(player);
 		LibVLC.media_release(media);
-		LibVLC.release(vlc);
+		LibVLC.release(instance);
 
 		UnloadTexture(texture);
 		CloseWindow();
