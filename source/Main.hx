@@ -19,8 +19,14 @@ import sys.FileSystem;
 @:cppNamespaceCode('
 static void *lock(void *data, void **p_pixels)
 {
-	Image *image = reinterpret_cast<Image *>(data);
-        (*p_pixels) = image->data;
+	Texture2D *texture = reinterpret_cast<Texture2D *>(data);
+
+	Image image = GetTextureData(*texture);
+
+        (*p_pixels) = image.data;
+
+	UnloadImage(image);
+
 	return NULL; /* picture identifier, not needed here */
 }
 
@@ -41,7 +47,6 @@ class Main
 		var media:cpp.RawPointer<LibVLC_Media_T>;
 		var player:cpp.RawPointer<LibVLC_MediaPlayer_T>;
 
-		var image:Image;
 		var texture:Texture2D;
 		
 		final location:String = Sys.getCwd() + 'video.mp4';
@@ -86,28 +91,22 @@ class Main
 		instance = LibVLC.create(untyped __cpp__('sizeof(args) / sizeof(*args)'), untyped __cpp__('args'));
 
 		if (instance == null)
-			Sys.println('Failed to initialize LibVLC, Error: ${cast(LibVLC.errmsg(), String)}');
+			Sys.println('Failed to initialize LibVLC');
 
 		media = LibVLC.media_new_path(instance, #if windows Path.normalize(location).split('/').join('\\') #else Path.normalize(location) #end);
 		
 		player = LibVLC.media_player_new_from_media(media);
 
-		image = GenImageColor(1280, 720, BLACK);
-		
-		texture = LoadTextureFromImage(image);
+		texture = LoadTextureFromImage(GenImageColor(1280, 720, BLACK));
 
-		SetTextureFilter(texture, TextureFilter.BILINEAR);
+		LibVLC.video_set_callbacks(player, untyped __cpp__('lock'), untyped __cpp__('unlock'), untyped __cpp__('display'), untyped __cpp__('&texture'));
 
-		LibVLC.video_set_callbacks(player, untyped __cpp__('lock'), untyped __cpp__('unlock'), untyped __cpp__('display'), untyped __cpp__('&image'));
-
-		LibVLC.video_set_format(player, "RGBA", 1280, 720, 1280 * 4);
+		LibVLC.video_set_format(player, "RGBA", texture.width, texture.height, texture.width * 4);
 
 		LibVLC.media_player_play(player);
 
 		while (!WindowShouldClose())
 		{
-			UpdateTexture(texture, image.data);
-
 			BeginDrawing();
 
 			ClearBackground(RAYWHITE);
