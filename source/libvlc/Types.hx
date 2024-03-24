@@ -4,13 +4,7 @@ package libvlc;
 #error 'LibVLC supports only C++ target platforms.'
 #end
 
-@:buildXml('
-<target id="haxe">
-	<section if="linux">
-		<lib name="-lvlc" />
-		<lib name="-lvlccore" />
-	</section>
-</target>')
+@:build(libvlc.Linker.xml())
 class Types {}
 
 @:include('vlc/vlc.h')
